@@ -1,0 +1,42 @@
+1st day:
+
+docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=localtestpw123@" `
+>>    -p 1433:1433 --name sqlserver2017 `
+>>    -d `
+>>    mcr.microsoft.com/mssql/server:2017-latest
+
+PS C:\Users\hre-test\source\repos\github> docker exec -it sqlserver2017 "bash"
+
+ docker run --network my-net -e SQLFQDN=sqlserver2017 -e SQLUSER=SA -e SQLPASS=localtestpw123@ -e SQLDB=mydrivingDB openhack/data-load:v1
+
+docker run -d --name poi --network my-net -p 8080:80 -e SQL_USER=SA -e SQL_PASSWORD=Testing!23 -e SQL_SERVER=sql1 -e SQL_DBNAME=mydrivingDB -e WEB_PORT=80 -e ASPNETCORE_ENVIRONMENT=Local -it poi
+
+docker run --network my-net -d --name user-java -p 8081:80 -e SQL_USER=SA -e SQL_PASSWORD=localtestpw123@ -e SQL_SERVER=sqlserver2017 -e SQL_DBNAME=mydrivingDB -it user-java
+
+
+az aks update -n  myAKSCluster -g myResourceGroup --attach-acr "/subscriptions/c5e3ad39-545c-4b70-a83e-0ee0815c0459/resourceGroups/teamResources/providers/Microsoft.ContainerRegistry/registries/registrylja6352"
+
+
+az ad group create --display-name hreAKSAdminGroup --mail-nickname hreAKSAdminGroup
+
+az group create --name hreResourceGroup --location centralus
+
+az aks create -g hreResourceGroup -n hreManagedCluster --enable-aad --aad-admin-group-object-ids 27328158-ccf2-476b-a168-72032d2e2f54
+
+az aks create --resource-group hrResourceGroup --name hrAKSCluster --enable-aad --aad-admin-group-object-ids 27328158-ccf2-476b-a168-72032d2e2f54 --enable-addons monitoring --generate-ssh-keys --attach-acr /subscriptions/c5e3ad39-545c-4b70-a83e-0ee0815c0459/resourceGroups/teamResources/providers/Microsoft.ContainerRegistry/registries/registrylja6352 --location northeurope --network-plugin azure --vnet-subnet-id /subscriptions/c5e3ad39-545c-4b70-a83e-0ee0815c0459/resourceGroups/teamResources/providers/Microsoft.Network/virtualNetworks/vnet/subnets/vm-subnet
+
+
+ az network vnet subnet list --resource-group teamResources --vnet-name vnet --query "[0].id" --output tsv
+
+
+AKS_CLUSTER=$(az aks show --resource-group hrResourceGroup --name hrAKSCluster --query id -o tsv)
+
+az role assignment create --assignee $ACCOUNT_ID --scope $AKS_CLUSTER --role "Azure Kubernetes Service Cluster Admin Role"
+
+az aks get-credentials --name hrAKSCluster --resource-group hrResourceGroup
+
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+
+helm install nginx-ingress ingress-nginx/ingress-nginx --namespace default --set controller.replicaCount=2 --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux --set controller.admissionWebhooks.patch.nodeSelector."beta\.kubernetes\.io/os"=linux
+
+az aks show --resource-group hrResourceGroup --name hrAKSCluster --query addonProfiles.httpApplicationRouting.config.HTTPApplicationRoutingZoneName -o table

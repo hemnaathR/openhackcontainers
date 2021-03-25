@@ -43,7 +43,7 @@ metadata:
   name: trips
   namespace: api
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   ports:
   - port: 80
   selector:

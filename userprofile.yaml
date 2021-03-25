@@ -43,7 +43,7 @@ metadata:
   name: userprofile
   namespace: api
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   ports:
   - port: 80
   selector:
