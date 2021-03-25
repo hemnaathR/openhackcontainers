@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-java
+  namespace: api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-java
+  template:
+    metadata:
+      labels:
+        app: user-java
+    spec:
+      nodeSelector:
+        "beta.kubernetes.io/os": linux
+      containers:
+      - name: user-java
+        image: registrylja6352.azurecr.io/user-java:latest
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 250m
+            memory: 256Mi
+        ports:
+        - containerPort: 80
+        env:
+        - name: SQL_USER
+          value: sqladminlJa6352
+        - name: SQL_PASSWORD
+          value: pF6nh8Qc6
+        - name: SQL_DBNAME
+          value: mydrivingDB
+        - name: SQL_SERVER
+          value: sqlserverlja6352.database.windows.net
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-java
+  namespace: api
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+  selector:
+    app: user-java

@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trips
+  namespace: api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: trips
+  template:
+    metadata:
+      labels:
+        app: trips
+    spec:
+      nodeSelector:
+        "beta.kubernetes.io/os": linux
+      containers:
+      - name: trips
+        image: registrylja6352.azurecr.io/trips:latest
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 250m
+            memory: 256Mi
+        ports:
+        - containerPort: 80
+        env:
+        - name: SQL_USER
+          value: sqladminlJa6352
+        - name: SQL_PASSWORD
+          value: pF6nh8Qc6
+        - name: SQL_DBNAME
+          value: mydrivingDB
+        - name: SQL_SERVER
+          value: sqlserverlja6352.database.windows.net
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: trips
+  namespace: api
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+  selector:
+    app: trips

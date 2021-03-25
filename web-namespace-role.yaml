@@ -1,0 +1,45 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: web
+  name: api-dev-role-for-web-namespace
+rules:
+  - apiGroups: [""]
+    resources: ["*"]
+    verbs: ["get", "watch", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: web
+  name: web-dev-role-for-web-namespace
+rules:
+  - apiGroup: [""]
+    resources: ["*"]
+    verbs: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: api-dev-role-for-web-namespace-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: api-dev-role-for-web-namespace
+subjects:
+  - apiGroup: rbac.authorization.k8s.io
+    kind: User
+    name: 9bd2751f-d99d-48ec-a709-1b2b2ad43655
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: web-dev-role-for-web-namespace-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: web-dev-role-for-web-namespace
+subjects:
+  - apiGroup: rbac.authorization.k8s.io
+    kind: User
+    name: 776c645f-4fc2-4839-a7c4-383cd3f79e03

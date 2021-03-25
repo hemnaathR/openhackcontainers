@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: poi
+  namespace: api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: poi
+  template:
+    metadata:
+      labels:
+        app: poi
+    spec:
+      nodeSelector:
+        "beta.kubernetes.io/os": linux
+      containers:
+      - name: poi
+        image: registrylja6352.azurecr.io/poi:latest
+        env:
+        - name: SQL_USER
+          value: sqladminlJa6352
+        - name: SQL_PASSWORD
+          value: pF6nh8Qc6
+        - name: SQL_DBNAME
+          value: mydrivingDB
+        - name: SQL_SERVER
+          value: sqlserverlja6352.database.windows.net                    
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 250m
+            memory: 256Mi
+        ports:
+        - containerPort: 80
+          name: web
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: poi
+  namespace: api
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+  selector:
+    app: poi
